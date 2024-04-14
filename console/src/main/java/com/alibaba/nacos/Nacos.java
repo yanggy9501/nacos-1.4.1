@@ -30,7 +30,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ServletComponentScan
 @EnableScheduling
 public class Nacos {
-    
+    /**
+     * 集群启动：
+     * -Dserver.port=8848 -Dnacos.home=D:\WorkSpace\nacos-1.4.1\nacos-home\nacos1
+     *
+     * 单机启动：
+     * -Dnacos.standalone=true
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         SpringApplication.run(Nacos.class, args);
     }

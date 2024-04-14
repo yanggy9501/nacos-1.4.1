@@ -36,16 +36,16 @@ import java.util.Map;
  * @author xiweng.yy
  */
 public class DistroDataStorageImpl implements DistroDataStorage {
-    
+
     private final DataStore dataStore;
-    
+
     private final DistroMapper distroMapper;
-    
+
     public DistroDataStorageImpl(DataStore dataStore, DistroMapper distroMapper) {
         this.dataStore = dataStore;
         this.distroMapper = distroMapper;
     }
-    
+
     @Override
     public DistroData getDistroData(DistroKey distroKey) {
         Map<String, Datum> result = new HashMap<>(1);
@@ -58,15 +58,17 @@ public class DistroDataStorageImpl implements DistroDataStorage {
         byte[] dataContent = ApplicationUtils.getBean(Serializer.class).serialize(result);
         return new DistroData(distroKey, dataContent);
     }
-    
+
     @Override
     public DistroData getDatumSnapshot() {
+        // 获取所有快照数据
         Map<String, Datum> result = dataStore.getDataMap();
         byte[] dataContent = ApplicationUtils.getBean(Serializer.class).serialize(result);
         DistroKey distroKey = new DistroKey("snapshot", KeyBuilder.INSTANCE_LIST_KEY_PREFIX);
         return new DistroData(distroKey, dataContent);
     }
-    
+
+    // 从本地数据中拿到校验数据
     @Override
     public DistroData getVerifyData() {
         Map<String, String> keyChecksums = new HashMap<>(64);
@@ -83,6 +85,7 @@ public class DistroDataStorageImpl implements DistroDataStorage {
         if (keyChecksums.isEmpty()) {
             return null;
         }
+        // 封装校验标记：类似一个偏移
         DistroKey distroKey = new DistroKey("checksum", KeyBuilder.INSTANCE_LIST_KEY_PREFIX);
         return new DistroData(distroKey, ApplicationUtils.getBean(Serializer.class).serialize(keyChecksums));
     }

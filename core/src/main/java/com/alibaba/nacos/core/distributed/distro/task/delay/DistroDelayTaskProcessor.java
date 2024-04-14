@@ -26,30 +26,34 @@ import com.alibaba.nacos.core.distributed.distro.task.execute.DistroSyncChangeTa
 
 /**
  * Distro delay task processor.
- *
+ * Distro 延迟任务执行器
  * @author xiweng.yy
  */
 public class DistroDelayTaskProcessor implements NacosTaskProcessor {
-    
+
     private final DistroTaskEngineHolder distroTaskEngineHolder;
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     public DistroDelayTaskProcessor(DistroTaskEngineHolder distroTaskEngineHolder,
             DistroComponentHolder distroComponentHolder) {
         this.distroTaskEngineHolder = distroTaskEngineHolder;
         this.distroComponentHolder = distroComponentHolder;
     }
-    
+
     @Override
     public boolean process(NacosTask task) {
         if (!(task instanceof DistroDelayTask)) {
             return true;
         }
+        // 处理 DistroDelayTask 任务
         DistroDelayTask distroDelayTask = (DistroDelayTask) task;
         DistroKey distroKey = distroDelayTask.getDistroKey();
+        // 操作类型时 数据的变更 CHANGE
         if (DataOperation.CHANGE.equals(distroDelayTask.getAction())) {
+            // 封装 最终的 DistroSyncChangeTask 任务
             DistroSyncChangeTask syncChangeTask = new DistroSyncChangeTask(distroKey, distroComponentHolder);
+            // 提交去执行  下一个入口：com.alibaba.nacos.core.distributed.distro.task.execute.DistroSyncChangeTask.run
             distroTaskEngineHolder.getExecuteWorkersManager().addTask(distroKey, syncChangeTask);
             return true;
         }

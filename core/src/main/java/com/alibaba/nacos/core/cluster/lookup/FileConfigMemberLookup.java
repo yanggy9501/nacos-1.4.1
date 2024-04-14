@@ -37,49 +37,56 @@ import java.util.List;
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
 public class FileConfigMemberLookup extends AbstractMemberLookup {
-    
+
     private FileWatcher watcher = new FileWatcher() {
         @Override
         public void onChange(FileChangeEvent event) {
             readClusterConfFromDisk();
         }
-        
+
         @Override
         public boolean interest(String context) {
             return StringUtils.contains(context, "cluster.conf");
         }
     };
-    
+
+    /**
+     * 启动
+     * @throws NacosException
+     */
     @Override
     public void start() throws NacosException {
         if (start.compareAndSet(false, true)) {
+            // 从磁盘读取 cluster.conf 配置文件获取集群节点信息
             readClusterConfFromDisk();
-            
             // Use the inotify mechanism to monitor file changes and automatically
             // trigger the reading of cluster.conf
             try {
+                // 监听文件的变更
                 WatchFileCenter.registerWatcher(EnvUtil.getConfPath(), watcher);
             } catch (Throwable e) {
                 Loggers.CLUSTER.error("An exception occurred in the launch file monitor : {}", e.getMessage());
             }
         }
     }
-    
+
     @Override
     public void destroy() throws NacosException {
         WatchFileCenter.deregisterWatcher(EnvUtil.getConfPath(), watcher);
     }
-    
+
     private void readClusterConfFromDisk() {
         Collection<Member> tmpMembers = new ArrayList<>();
         try {
+            // 读取配置文件 获取集群节点信息
             List<String> tmp = EnvUtil.readClusterConf();
+            // 将每个节点配置转换成 Member 对象
             tmpMembers = MemberUtil.readServerConf(tmp);
         } catch (Throwable e) {
             Loggers.CLUSTER
                     .error("nacos-XXXX [serverlist] failed to get serverlist from disk!, error : {}", e.getMessage());
         }
-        
+        // 寻址之后的一些操作
         afterLookup(tmpMembers);
     }
 }

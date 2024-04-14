@@ -35,41 +35,44 @@ import java.util.List;
  * @author xiweng.yy
  */
 public class DistroHttpAgent implements DistroTransportAgent {
-    
+
     private final ServerMemberManager memberManager;
-    
+
     public DistroHttpAgent(ServerMemberManager memberManager) {
         this.memberManager = memberManager;
     }
-    
+
     @Override
     public boolean syncData(DistroData data, String targetServer) {
         if (!memberManager.hasMember(targetServer)) {
             return true;
         }
+        // 获取要同步的数据
         byte[] dataContent = data.getContent();
+        // 使用 NamingProxy 进行同步
         return NamingProxy.syncData(dataContent, data.getDistroKey().getTargetServer());
     }
-    
+
     @Override
     public void syncData(DistroData data, String targetServer, DistroCallback callback) {
-    
+
     }
-    
+
     @Override
     public boolean syncVerifyData(DistroData verifyData, String targetServer) {
         if (!memberManager.hasMember(targetServer)) {
             return true;
         }
+        // 通过 NamingProxy 同步校验
         NamingProxy.syncCheckSums(verifyData.getContent(), targetServer);
         return true;
     }
-    
+
     @Override
     public void syncVerifyData(DistroData verifyData, String targetServer, DistroCallback callback) {
-    
+
     }
-    
+
     @Override
     public DistroData getData(DistroKey key, String targetServer) {
         try {
@@ -86,11 +89,13 @@ public class DistroHttpAgent implements DistroTransportAgent {
             throw new DistroException(String.format("Get data from %s failed.", key.getTargetServer()), e);
         }
     }
-    
+
     @Override
     public DistroData getDatumSnapshot(String targetServer) {
         try {
+            //从namingProxy代理获取所有的数据data，从获取的结果result中获取数据bytes；
             byte[] allDatum = NamingProxy.getAllData(targetServer);
+            //将数据封装成DistroData
             return new DistroData(new DistroKey("snapshot", KeyBuilder.INSTANCE_LIST_KEY_PREFIX), allDatum);
         } catch (Exception e) {
             throw new DistroException(String.format("Get snapshot from %s failed.", targetServer), e);

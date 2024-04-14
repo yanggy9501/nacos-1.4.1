@@ -31,23 +31,28 @@ import java.util.List;
  * @author xiweng.yy
  */
 public class DistroVerifyTask implements Runnable {
-    
+
     private final ServerMemberManager serverMemberManager;
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     public DistroVerifyTask(ServerMemberManager serverMemberManager, DistroComponentHolder distroComponentHolder) {
         this.serverMemberManager = serverMemberManager;
         this.distroComponentHolder = distroComponentHolder;
     }
-    
+
+    /**
+     * 分区数据定时同步校验
+     */
     @Override
     public void run() {
         try {
+            // 获取集群其他节点
             List<Member> targetServer = serverMemberManager.allMembersWithoutSelf();
             if (Loggers.DISTRO.isDebugEnabled()) {
                 Loggers.DISTRO.debug("server list is: {}", targetServer);
             }
+            // 所有数据均向其他节点进行同步检查
             for (String each : distroComponentHolder.getDataStorageTypes()) {
                 verifyForDataStorage(each, targetServer);
             }
@@ -55,15 +60,18 @@ public class DistroVerifyTask implements Runnable {
             Loggers.DISTRO.error("[DISTRO-FAILED] verify task failed.", e);
         }
     }
-    
+
     private void verifyForDataStorage(String type, List<Member> targetServer) {
+        // 封装校验信息
         DistroData distroData = distroComponentHolder.findDataStorage(type).getVerifyData();
         if (null == distroData) {
             return;
         }
+        // 操作类型是 VERIFY 校验
         distroData.setType(DataOperation.VERIFY);
         for (Member member : targetServer) {
             try {
+                // 同步检查数据 发送校验信息
                 distroComponentHolder.findTransportAgent(type).syncVerifyData(distroData, member.getAddress());
             } catch (Exception e) {
                 Loggers.DISTRO.error(String

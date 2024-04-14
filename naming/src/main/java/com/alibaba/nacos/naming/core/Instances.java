@@ -35,20 +35,21 @@ import java.util.Map;
  * @author nkorange
  * @since 1.0.0
  */
+// 实例集合的包装，Instances 包含多个实例 Instances
 public class Instances implements Record {
-    
+
     private static final long serialVersionUID = 5500823673993740145L;
-    
+
     private List<Instance> instanceList = new ArrayList<>();
-    
+
     public List<Instance> getInstanceList() {
         return instanceList;
     }
-    
+
     public void setInstanceList(List<Instance> instanceList) {
         this.instanceList = instanceList;
     }
-    
+
     @Override
     public String toString() {
         try {
@@ -57,14 +58,14 @@ public class Instances implements Record {
             throw new RuntimeException("Instances toJSON failed", e);
         }
     }
-    
+
     @Override
     @JsonIgnore
     public String getChecksum() {
-        
+
         return recalculateChecksum();
     }
-    
+
     private String recalculateChecksum() {
         StringBuilder sb = new StringBuilder();
         Collections.sort(instanceList);
@@ -75,10 +76,10 @@ public class Instances implements Record {
             sb.append(string);
             sb.append(",");
         }
-        
+
         return MD5Utils.md5Hex(sb.toString(), Constants.ENCODE);
     }
-    
+
     /**
      * Convert Map to KV string with ':'.
      *
@@ -86,11 +87,11 @@ public class Instances implements Record {
      * @return KV string with ':'
      */
     public String convertMap2String(Map<String, String> map) {
-        
+
         if (map == null || map.isEmpty()) {
             return StringUtils.EMPTY;
         }
-        
+
         StringBuilder sb = new StringBuilder();
         List<String> keys = new ArrayList<>(map.keySet());
         Collections.sort(keys);

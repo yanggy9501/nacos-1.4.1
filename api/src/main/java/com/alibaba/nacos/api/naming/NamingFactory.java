@@ -27,7 +27,7 @@ import java.util.Properties;
  * @author nkorange
  */
 public class NamingFactory {
-    
+
     /**
      * Create a new naming service.
      *
@@ -45,9 +45,9 @@ public class NamingFactory {
             throw new NacosException(NacosException.CLIENT_INVALID_PARAM, e);
         }
     }
-    
+
     /**
-     * Create a new naming service.
+     * Create a new naming service. 创建命名服务对象: NacosNamingService
      *
      * @param properties naming service properties
      * @return new naming service
@@ -57,6 +57,10 @@ public class NamingFactory {
         try {
             Class<?> driverImplClass = Class.forName("com.alibaba.nacos.client.naming.NacosNamingService");
             Constructor constructor = driverImplClass.getConstructor(Properties.class);
+            /**
+             * 通过构造函数创建对象：
+             * 在 NacosNamingService 的构造函数中做了一些初始化的相关操作，如：创建通信工具，登录认证等
+             */
             NamingService vendorImpl = (NamingService) constructor.newInstance(properties);
             return vendorImpl;
         } catch (Throwable e) {
