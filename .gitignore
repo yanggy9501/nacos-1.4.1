@@ -1,4 +1,4 @@
-# Except this file !.gitignore 
+# Except this file !.gitignore
 .classpath
 .project
 .settings
@@ -16,3 +16,8 @@ work
 test/logs
 derby.log
 yarn.lock
+
+/distribution/
+/distribution/node1-8847
+/distribution/node2-8848
+/distribution/node3-8849
