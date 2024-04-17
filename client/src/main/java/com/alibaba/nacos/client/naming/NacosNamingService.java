@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Nacos Naming Service. 一个命名空间对应一个 NacosNamingService 实例
+ * Nacos Naming Service. 一个命名空间对应一个 NacosNamingService 实例，其负责与 nacos server 交换（连接，心跳，服务获取等等）
  *
  * @author nkorange
  */
@@ -111,7 +111,7 @@ public class NacosNamingService implements NamingService {
          *  创建了三个比较重要的对象
          *  serverProxy=NamingProxy：http client 封装，nacos 客户端最终都是通过 serverProxy 和 nacos 服务端交互的
          *  beatReactor=BeatReactor：心跳检查，健康状态的检查
-         *  hostReactor=HostReactor：
+         *  hostReactor=HostReactor：定期拉取服务列表
          */
         this.serverProxy = new NamingProxy(this.namespace, this.endpoint, this.serverList, properties);
         // 心跳反应器（定时任务线程池）
@@ -372,9 +372,9 @@ public class NacosNamingService implements NamingService {
      * 获取服务下的实例列表信息
      *
      * @param serviceName name of service           服务名称
-     * @param groupName   group of service          分组名称
-     * @param clusters    list of cluster           集群信息
-     * @param subscribe   if subscribe the service  是否订阅（缓存）
+     * @param groupName   group of service          分组名称|默认 DEFAULT_GROUP
+     * @param clusters    list of cluster           集群信息|默认空
+     * @param subscribe   if subscribe the service  是否订阅（缓存）|默认 true
      * @return
      * @throws NacosException
      */

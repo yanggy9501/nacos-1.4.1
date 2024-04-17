@@ -44,6 +44,7 @@ import static com.alibaba.nacos.client.utils.LogUtils.NAMING_LOGGER;
  *
  * @author harold
  */
+// 心跳响应器：心跳检查
 public class BeatReactor implements Closeable {
 
     private final ScheduledExecutorService executorService;

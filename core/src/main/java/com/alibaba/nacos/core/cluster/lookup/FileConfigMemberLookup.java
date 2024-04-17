@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
+// 基于文件配置的集群寻址模式（配置文件中配置集群所有服务地址）
 public class FileConfigMemberLookup extends AbstractMemberLookup {
 
     private FileWatcher watcher = new FileWatcher() {
@@ -52,6 +53,7 @@ public class FileConfigMemberLookup extends AbstractMemberLookup {
 
     /**
      * 启动
+     *
      * @throws NacosException
      */
     @Override
@@ -84,7 +86,7 @@ public class FileConfigMemberLookup extends AbstractMemberLookup {
             tmpMembers = MemberUtil.readServerConf(tmp);
         } catch (Throwable e) {
             Loggers.CLUSTER
-                    .error("nacos-XXXX [serverlist] failed to get serverlist from disk!, error : {}", e.getMessage());
+                .error("nacos-XXXX [serverlist] failed to get serverlist from disk!, error : {}", e.getMessage());
         }
         // 寻址之后的一些操作
         afterLookup(tmpMembers);

@@ -76,6 +76,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
+// 集群的成员管理
 @Component(value = "serverMemberManager")
 public class ServerMemberManager implements ApplicationListener<WebServerInitializedEvent> {
 
@@ -151,7 +152,8 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         // register NodeChangeEvent publisher to NotifyManager
         registerClusterEvent();
 
-        // Initializes the lookup mode  初始化集群寻址模式 ***关注一下***
+        // Initializes the lookup mode
+        //【初始化集群寻址模式 关注一下】
         initAndStartLookup();
 
         if (serverList.isEmpty()) {

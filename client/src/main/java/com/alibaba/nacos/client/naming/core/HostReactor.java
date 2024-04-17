@@ -62,6 +62,7 @@ public class HostReactor implements Closeable {
 
     private static final long UPDATE_HOLD_INTERVAL = 5000L;
 
+    // 定时任务执行结果：key=服务，value=定时任务执行的Future
     private final Map<String, ScheduledFuture<?>> futureMap = new HashMap<String, ScheduledFuture<?>>();
     // 本地缓存：所有服务信息
     private final Map<String, ServiceInfo> serviceInfoMap;
@@ -251,7 +252,7 @@ public class HostReactor implements Closeable {
             if (newHosts.size() > 0 || remvHosts.size() > 0 || modHosts.size() > 0) {
                 /**
                  * 发布：实例状态改变的事件
-                 *  服务的监听器会收到该事件，触发监听方法的执行
+                 * 服务的监听器会收到该事件，触发监听方法的执行
                  */
                 // @see com.alibaba.nacos.client.naming.event.InstancesChangeNotifier
                 NotifyCenter.publishEvent(new InstancesChangeEvent(serviceInfo.getName(), serviceInfo.getGroupName(),
@@ -339,13 +340,16 @@ public class HostReactor implements Closeable {
             serviceObj = new ServiceInfo(serviceName, clusters);
 
             serviceInfoMap.put(serviceObj.getKey(), serviceObj);
+            // 标记服务在更新
             updatingMap.put(serviceName, new Object());
+
             // 从nacos server 获取服务信息 并更新到本地缓存【重点看这】
             updateServiceNow(serviceName, clusters);
 
+            // 服务更新结束，移除标记
             updatingMap.remove(serviceName);
 
-        } else if (updatingMap.containsKey(serviceName)) {
+        } else if (updatingMap.containsKey(serviceName)) { // 本地缓存中存在，且该服务在更新中则等待 5 秒
 
             if (UPDATE_HOLD_INTERVAL > 0) {
                 // hold a moment waiting for update finish
