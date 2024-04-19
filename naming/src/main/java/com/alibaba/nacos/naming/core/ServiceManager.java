@@ -92,6 +92,7 @@ public class ServiceManager implements RecordListener<Service> {
 
     private final Lock lock = new ReentrantLock();
 
+    // 一致性服务
     @Resource(name = "consistencyDelegate")
     private ConsistencyService consistencyService;
 
@@ -884,6 +885,8 @@ public class ServiceManager implements RecordListener<Service> {
      */
     public void putService(Service service) {
         if (!serviceMap.containsKey(service.getNamespaceId())) {
+            // 尽管 ConcurrentHashMap 是线程安全的（保证读写排队操作），但是这里需要加锁，不然一个线程 put 一个 ConcurrentSkipListMap
+            // 之后可能会其他线程覆盖，更要命的是被覆盖的 ConcurrentSkipListMap 还存有东西。这个时候就不安全了
             synchronized (putServiceLock) {
                 if (!serviceMap.containsKey(service.getNamespaceId())) {
                     serviceMap.put(service.getNamespaceId(), new ConcurrentSkipListMap<>());
@@ -896,7 +899,7 @@ public class ServiceManager implements RecordListener<Service> {
     private void putServiceAndInit(Service service) throws NacosException {
         // 存储到 serviceMap
         putService(service);
-        // 服务初始化（服务刚创建，初始化服务设置服务中集群所属的服务，心跳等等）
+        // 服务初始化（服务刚创建，初始化服务 设置服务中集群所属的服务，心跳等等）
         service.init();
         /**
          * 一致性服务|consistencyService 添加监听器 Listener 即当前 com.alibaba.nacos.naming.core.Service

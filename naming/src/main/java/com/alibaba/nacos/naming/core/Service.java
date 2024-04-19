@@ -60,6 +60,7 @@ import java.util.Map;
  * @author nkorange
  */
 // nacos serve 端服务 po 类，比客户端的服务做了更多的细化；模型；service --> cluster --> instance
+// Service 本身是一个自定义的监听器，服务的实例变化 -> com.alibaba.nacos.naming.core.Service.onChange
 @JsonInclude(Include.NON_NULL)
 public class Service extends com.alibaba.nacos.api.naming.pojo.Service implements Record, RecordListener<Instances> {
 
@@ -99,7 +100,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
      */
     private long pushCacheMillis = 0L;
 
-    // 服务的集群分组 map
+    // 服务的集群分组 map(集群中存放一个个服务的实例)
     private Map<String, Cluster> clusterMap = new HashMap<>();
 
     public Service() {
