@@ -32,10 +32,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Nacos {
     /**
      * 集群启动：
-     * -Dserver.port=8848 -Dnacos.home=D:\WorkSpace\nacos-1.4.1\nacos-home\nacos1
+     * -Dserver.port=8848 -Dnacos.home=nacos-1.4.1\nacos-home\nacos1
      *
      * 单机启动：
-     * -Dnacos.standalone=true
+     * -Dnacos.standalone=true -Dnacos.home=nacos-1.4.1\nacos-home\nacos-standalone
      *
      * @param args
      */
